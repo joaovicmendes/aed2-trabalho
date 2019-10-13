@@ -12,51 +12,63 @@
 #include <iostream>
 #include <cstdlib>
 
-class Merge
+class Quick
 {
     public:
-    // Função que ordena um vetor [ini .. fim - 1] de doubles, dada uma posição 
-    // inicial e final.
+    static double Seleciona(double *arr, int ini, int fim, int k)
+    {
+        int pivo = Quick::Particiona(arr, ini, fim);
+
+        if (pivo == k)
+            return arr[pivo];
+        else if (pivo > k)
+            return Quick::Seleciona(arr, ini, pivo, k);
+        else
+            return Quick::Seleciona(arr, pivo + 1, fim, k);        
+    }
+
     static void Sort(double *arr, int ini, int fim)
     {
-        if (ini + 1 < fim)
+        if (ini < fim)
         {
-            int m = ini + (fim - ini) / 2;
-
-            Merge::Sort(arr, ini, m);
-            Merge::Sort(arr, m, fim);
-
-            Merge::merge(arr, ini, m, fim);
+            int pivo = Quick::Particiona(arr, ini, fim);
+            Quick::Sort(arr, ini, pivo);
+            Quick::Sort(arr, pivo + 1, fim);
         }
     }
 
     private:
-    // Função auxiliar da Sort(). Não deve ser usada por conta própria.
-    static void merge(double *arr, int ini, int meio, int fim)
+    // Troca o valor de dois indices de um vetor, não verifica tamanho
+    static void troca(double *arr, int a, int b)
     {
-        int i = ini;
-        int j = meio;
-        int k = 0;
+        double aux = arr[a];
+        arr[a] = arr[b];
+        arr[b] = aux;
+    }
+    // Partição do QuickSort
+    static int Particiona(double *arr, int ini, int fim)
+    {
+        int pivo = (ini + fim) / 2;
+        Quick::troca(arr, ini, pivo);
 
-        double *aux = (double *) malloc((fim - ini) * sizeof(double));
+        pivo = ini;
+        int i = ini + 1;
+        int j = fim - 1;
 
-        while(i < meio && j < fim)
+        while (i <= j)
         {
-            if (arr[i] < arr[j])
-                aux[k++] = arr[i++];
-            else
-                aux[k++] = arr[j++];
+            while (i < fim && arr[i] <= arr[pivo])
+                i++;
+            while (arr[j] > arr[pivo])
+                j--;
+
+            if (i < j)
+                Quick::troca(arr, i, j);
         }
 
-        while(i < meio)
-            aux[k++] = arr[i++];
-        while(j < fim)
-            aux[k++] = arr[j++];
+        Quick::troca(arr, pivo, j);
 
-        for (k = 0; k < (fim - ini); k++)
-            arr[ini + k] = aux[k];
-
-        free(aux);
+        return j;
     }
 };
 
@@ -64,11 +76,10 @@ int detecta_outliers(double **matriz, int n, int k, double limite)
 {
     int outliers = 0;
 
+    // Para cada linha, seleciona o k+1-ésimo
     for (int i = 0; i < n; i++)
     {
-        // double dist = Quick::Seleciona(matriz[i], 0, n, k + 1); 
-        Merge::Sort(matriz[i], 0, n); 
-        double dist = matriz[i][k + 1]; 
+        double dist = Quick::Seleciona(matriz[i], 0, n, k + 1); 
         if (dist > limite)
             outliers++;
     }
@@ -81,10 +92,10 @@ int main(int argc, char **argv)
     srand(time(NULL));
 
     char file_name[100];
-    int outliers; // Número de outliers
-    int N;        // Tamanho da matriz
-    int k;        // k-ésimo vizinho mais próximo a ser comparado
-    double L;     // Limitante inferior para detectar outlier
+    int outliers;            // Número de outliers
+    int N;                   // Tamanho da matriz
+    int k;                   // k-ésimo vizinho mais próximo a ser comparado
+    double L;                // Limitante inferior para detectar outlier
     double **matriz = NULL;
     FILE *entrada;
 
@@ -96,15 +107,14 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
+    // Lendo N, k, L e alocando o espaço para a matriz
     fscanf(entrada, "%d %d %lf", &N, &k, &L);
-
-    // Alocando espaço da matriz
     matriz = (double **) malloc((N) * sizeof(double *));
 
     for (int i = 0; i < N; i++)
         matriz[i] = (double *) malloc((N) * sizeof(double));
 
-    // Lendo matriz de input
+    // Preenchendo a matriz de dados
     for (int i = 0; i < N; i++)
     {
         for (int j = 0; j < N; j++)
@@ -116,7 +126,6 @@ int main(int argc, char **argv)
     outliers = detecta_outliers(matriz, N, k, L);
     printf("%d\n", outliers);
 
-    // Liberando a matriz
     for (int i = 0; i < N; i++)
         free(matriz[i]);
     free(matriz);
