@@ -87,13 +87,23 @@ int main()
 {
     srand(time(NULL));
 
+    char file_name[100];
     int outliers; // Número de outliers
-    int N;       // Tamanho da matriz
-    int k;       // k-ésimo vizinho mais próximo a ser comparado
-    double L;    // Limitante inferior para detectar outlier
+    int N;        // Tamanho da matriz
+    int k;        // k-ésimo vizinho mais próximo a ser comparado
+    double L;     // Limitante inferior para detectar outlier
     double **matriz = NULL;
+    FILE *entrada;
 
-    scanf("%d %d %lf ", &N, &k, &L);
+    scanf("%s", file_name);
+    entrada = fopen(file_name, "r");
+    if (entrada == NULL)
+    {
+        printf("\nNão encontrei o arquivo!\n");
+        exit(EXIT_FAILURE);
+    }
+
+    fscanf(entrada, "%d %d %lf", &N, &k, &L);
 
     // Alocando espaço da matriz
     matriz = (double **) malloc((N) * sizeof(double *));
@@ -103,7 +113,7 @@ int main()
     // Lendo matriz de input
     for (int i = 0; i < N; i++)
         for (int j = 0; j < N; j++)
-            scanf("%lf ", &matriz[i][j]);
+            fscanf(entrada, "%lf", &matriz[i][j]);
 
     outliers = detecta_outliers(matriz, N, k, L);
     printf("%d\n", outliers);
@@ -112,6 +122,8 @@ int main()
     for (int i = 0; i < N; i++)
         free(matriz[i]);
     free(matriz);
+
+    fclose(entrada);
 
     return 0;
 }
