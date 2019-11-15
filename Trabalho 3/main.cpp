@@ -8,7 +8,7 @@
     Aluno: João Victor Mendes Freire
     RA: 758943
 
-    Baseado do algoritmo apresentado em https://www.ime.usp.br/~pf/algoritmos/aulas/strma.html
+    Baseado no algoritmo apresentado em https://www.ime.usp.br/~pf/algoritmos/aulas/strma.html
 */
 
 #include <iostream>
