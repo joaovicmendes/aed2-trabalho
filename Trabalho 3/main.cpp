@@ -26,7 +26,7 @@ std::vector<long> boyer_moore(const std::string& pattern, const std::string& tex
     for (int f = 0; f < 256; ++f)
         ult[f] = 0;
     for (int g = 0; g < m; ++g)
-        ult[pattern.at(g)] = g;
+        ult[(int)pattern.at(g)] = g;
 
     // Pré-processamento do padrão (good-char rule)
     jump = (int *)malloc(m * sizeof(int));
@@ -58,7 +58,7 @@ std::vector<long> boyer_moore(const std::string& pattern, const std::string& tex
         else 
         {
             good_c = m - jump[i];
-            bad_c  = m - ult[text.at(k)];
+            bad_c  = m - ult[(int)text.at(k)];
             k += (good_c > bad_c) ? good_c : bad_c;
         }
     }
@@ -105,7 +105,7 @@ int main(int argc, char **argv)
 
     results = boyer_moore(pattern, text);
     
-    for (int i = 0; i < results.size(); i++)
+    for (unsigned int i = 0; i < results.size(); i++)
         std::cout << results.at(i) << '\n';
 
     return 0;
