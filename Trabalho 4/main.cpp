@@ -102,7 +102,7 @@ int Grafo::Dijkstra(int ori, int dest) const
     dist[ori] = 0;
     pq.push(std::make_pair(0, ori));
 
-    while (!visitado[dest] || pq.empty())
+    while (!visitado[dest] && !pq.empty())
     {
         // Retirando o elemento com menor distância
         v = pq.top().second;
